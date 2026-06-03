@@ -28,25 +28,109 @@ These values satisfy the assignment caps: chunk size is at most 1024 tokens, ove
 
 ## Experiment Summary
 
-The workflow validated retrieval on small subsets before scaling:
+The experiments used a deterministic 100-row subset of the Medium corpus and a 20-question golden evaluation set. The questions covered factual article lookup, thematic lookup, multi-article listing/comparison, and unsupported questions where the assistant should answer that it does not know.
 
-1. Smoke-tested the pipeline on a tiny subset.
-2. Compared embedding content variants on a deterministic 100-row subset.
-3. Ran a chunk-size, overlap, and top-k grid over the 100-row subset.
-4. Added a harder 100-row add-on evaluation because the original set was too easy to distinguish the top configs.
-5. Selected `chunk_only`, `chunk_size=768`, `overlap_ratio=0.10`, `top_k=5`.
-6. Ingested the full 7,682-article corpus into Pinecone namespace `prod`.
+Each run used the same API chain:
 
-The selected config scored perfectly on the original curated 20-question subset and tied for the best reviewed score on the hard add-on set. Detailed experiment notes are in:
+1. Rewrite the user question for retrieval.
+2. Embed the rewritten query.
+3. Retrieve from Pinecone.
+4. Deduplicate retrieved contexts by article.
+5. Generate an answer from retrieved context only.
+6. Score retrieval and answer quality against the golden expectations.
+
+The main metrics were:
+
+- `recall_at_k`: whether expected article IDs appeared in retrieved context for answerable questions.
+- `answer_pass_rate`: reviewed answer correctness.
+- `combined_score`: aggregate of retrieval, answer, deduplication, and unsupported-question behavior.
+- `idk_pass_rate`: whether unsupported questions were rejected correctly.
+- `retrieval_issues` and `answer_issues`: reviewed failure counts.
+
+All Phase A and Phase B runs used `4UHRUIN-text-embedding-3-small`, `4UHRUIN-gpt-5-mini`, Pinecone index `medium-rag`, `retrieval_fetch_k=30`, and `reasoning_effort=low`.
+
+Supporting experiment notes are in:
 
 - `reports/eval/phase_a_b_experiments_20260603.md`
 - `reports/eval/final_config_decision_20260602.md`
 - `reports/eval/hard_addon_10_config_aggregate_20260602.md`
 - `reports/eval/prod_scale_sanity_20260602.md`
 
-Phase A compared embedded text formats. With fixed `chunk_size=512`, `overlap_ratio=0.10`, and `top_k=5`, `chunk_only` reached `1.0000` recall and `0.9833` combined score, while `title_tags_chunk` reached `0.9375` recall and `0.9458` combined score.
+### Phase A: Embedding Content
 
-Phase B then swept chunk size, overlap, and top-k for `chunk_only`. The original 20-question set was useful as a filter but too easy as a final selector: 10 of 27 Phase B configurations scored perfectly. A harder add-on set was therefore run against only those 10 tied configs. The final selected config, `chunk_size=768`, `overlap_ratio=0.10`, `top_k=5`, tied for the best hard-add-on combined score while using less retrieved context than the `top_k=8` alternative and less overlap than the `0.15` alternative.
+Phase A tested what text should be embedded for each chunk. The fixed baseline settings were `chunk_size=512`, `overlap_ratio=0.10`, and `top_k=5`.
+
+| Config | Embed Content | Recall | Answer Pass | Combined | IDK | Retrieval Issues | Answer Issues | Cost |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `chunk_only_c512_o10` | `chunk_only` | 1.0000 | 0.9500 | 0.9833 | 1.0000 | 0 | 1 | $0.024121 |
+| `title_tags_chunk_c512_o10` | `title_tags_chunk` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 1 | $0.022467 |
+
+`chunk_only` performed better on this subset. It retrieved every expected answerable article and had only one answer-level issue. The `title_tags_chunk` variant looked attractive because article titles and tags can help keyword-style queries, but in this subset it introduced a retrieval miss and another retrieval-quality issue. The likely reason is that title and tag text can overweight broad topic labels relative to passage semantics.
+
+Decision after Phase A: continue the grid search with `embed_content=chunk_only`.
+
+### Phase B: Chunk, Overlap, and Top-k
+
+Phase B held `chunk_only` fixed and swept chunk size, overlap, and top-k.
+
+| Parameter | Values Tried |
+|---|---|
+| `chunk_size` | `512`, `768`, `1024` |
+| `overlap_ratio` | `0.05`, `0.10`, `0.15` |
+| `top_k` | `3`, `5`, `8` |
+
+This produced 27 configurations. All settings were inside the assignment limits.
+
+| Config | Chunk | Overlap | Top-k | Recall | Answer Pass | Combined | IDK | Retrieval Issues | Answer Issues | Cost |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `c512_o05_k3` | 512 | 0.05 | 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | - | - | $0.020335 |
+| `c512_o05_k5` | 512 | 0.05 | 5 | 1.0000 | 0.9500 | 0.9833 | 1.0000 | 0 | 1 | $0.020189 |
+| `c512_o05_k8` | 512 | 0.05 | 8 | 1.0000 | 0.9000 | 0.9667 | 1.0000 | 0 | 2 | $0.020053 |
+| `c512_o10_k3` | 512 | 0.10 | 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.018547 |
+| `c512_o10_k5` | 512 | 0.10 | 5 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.020782 |
+| `c512_o10_k8` | 512 | 0.10 | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.018007 |
+| `c512_o15_k3` | 512 | 0.15 | 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.015906 |
+| `c512_o15_k5` | 512 | 0.15 | 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.018177 |
+| `c512_o15_k8` | 512 | 0.15 | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.020255 |
+| `c768_o05_k3` | 768 | 0.05 | 3 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.023978 |
+| `c768_o05_k5` | 768 | 0.05 | 5 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.019521 |
+| `c768_o05_k8` | 768 | 0.05 | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.025363 |
+| `c768_o10_k3` | 768 | 0.10 | 3 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.016743 |
+| `c768_o10_k5` | 768 | 0.10 | 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.020708 |
+| `c768_o10_k8` | 768 | 0.10 | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.025887 |
+| `c768_o15_k3` | 768 | 0.15 | 3 | 0.9375 | 1.0000 | 0.9792 | 1.0000 | 1 | 0 | $0.019633 |
+| `c768_o15_k5` | 768 | 0.15 | 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 0 | $0.019272 |
+| `c768_o15_k8` | 768 | 0.15 | 8 | 1.0000 | 0.9500 | 0.9833 | 1.0000 | 0 | 1 | $0.022865 |
+| `c1024_o05_k3` | 1024 | 0.05 | 3 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.022564 |
+| `c1024_o05_k5` | 1024 | 0.05 | 5 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | - | - | $0.023274 |
+| `c1024_o05_k8` | 1024 | 0.05 | 8 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.031442 |
+| `c1024_o10_k3` | 1024 | 0.10 | 3 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 2 | 1 | $0.019251 |
+| `c1024_o10_k5` | 1024 | 0.10 | 5 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.022930 |
+| `c1024_o10_k8` | 1024 | 0.10 | 8 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.028829 |
+| `c1024_o15_k3` | 1024 | 0.15 | 3 | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 1 | $0.022317 |
+| `c1024_o15_k5` | 1024 | 0.15 | 5 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | - | - | $0.019358 |
+| `c1024_o15_k8` | 1024 | 0.15 | 8 | 0.9375 | 0.9500 | 0.9625 | 1.0000 | - | - | $0.029029 |
+
+The original 20-question set filtered out weak settings but was not hard enough to choose a single winner. Ten configurations achieved a perfect reviewed combined score. The 1024-token chunks were less reliable on this subset because every 1024-token run had recall below 1.0. The 512-token chunks were strong and cheap, but more fragmented. The 768-token chunks gave the best balance between semantic coverage and context size.
+
+### Hard Add-on Check
+
+The hard add-on set was run only on the ten Phase B configurations that scored perfectly on the original set, avoiding extra spend on already-weaker configs.
+
+| Config | Recall | Answer Pass | Combined | IDK | Retrieval Issues | Answer Issues | Cost |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `c768_o05_k8` | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 2 | 1 | $0.036749 |
+| `c768_o10_k5` | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.025350 |
+| `c768_o15_k5` | 0.9375 | 0.9500 | 0.9625 | 1.0000 | 1 | 1 | $0.023632 |
+| `c512_o05_k3` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 3 | 2 | $0.017304 |
+| `c512_o10_k8` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 2 | $0.024359 |
+| `c512_o15_k3` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 2 | $0.015975 |
+| `c512_o15_k5` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | - | - | $0.019840 |
+| `c512_o15_k8` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 2 | $0.021151 |
+| `c768_o10_k8` | 0.9375 | 0.9000 | 0.9458 | 1.0000 | 2 | 1 | $0.025800 |
+| `c512_o10_k3` | 0.9375 | 0.8500 | 0.9292 | 1.0000 | - | - | $0.018094 |
+
+The hard add-on changed the decision. The cheaper 512-token candidates that looked perfect in Phase B fell behind. The top tier became `c768_o05_k8`, `c768_o10_k5`, and `c768_o15_k5`. All three tied on answer pass and combined score. `c768_o10_k5` was selected because it used less context than `c768_o05_k8` and less overlap than `c768_o15_k5`, while keeping the same hard-add-on score.
 
 ## Known Retrieval Limitation
 
