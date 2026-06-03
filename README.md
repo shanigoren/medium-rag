@@ -89,16 +89,19 @@ Response:
 
 ```json
 {
-  "answer": "...",
-  "contexts": [
+  "response": "...",
+  "context": [
     {
       "article_id": "123",
       "title": "...",
-      "url": "...",
-      "chunk_index": 0,
+      "chunk": "...",
       "score": 0.72
     }
-  ]
+  ],
+  "Augmented_prompt": {
+    "System": "...",
+    "User": "..."
+  }
 }
 ```
 
