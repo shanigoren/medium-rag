@@ -1,0 +1,26 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+
+# Local course files
+course material/
+reports/tmp_course_text/
+
+# Local detailed experiment artifacts
+reports/costs/
+reports/proposals/
+reports/eval/eval20_*/
+
+# Saved stdout from money-costing runs
+run_logs/
+
+# Data: large binary, lives locally and in Pinecone only
+medium-english-50mb.csv

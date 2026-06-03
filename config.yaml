@@ -1,0 +1,16 @@
+# RAG hyperparameters (final selected config from Phase B + hard add-on eval)
+chunk_size: 768                # tokens; selected config c768_o10_k5
+overlap_ratio: 0.10            # 10%; tied best without extra overlap cost
+top_k: 5                       # tied best on hard add-on; less context than k=8
+retrieval_fetch_k: 30          # over-fetch then dedupe (assignment cap is 30)
+embed_content: "chunk_only"    # Phase A winner; final selected config
+
+# Models (LLMod.AI proxy)
+embed_model: "4UHRUIN-text-embedding-3-small"
+embed_dim: 1536
+chat_model: "4UHRUIN-gpt-5-mini"
+reasoning_effort: "low"
+
+# Pinecone
+pinecone_index: "medium-rag"
+pinecone_namespace: "prod"

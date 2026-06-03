@@ -1,0 +1,250 @@
+{
+  "dataset": "medium-english-50mb.csv",
+  "limit": 100,
+  "selection_method": "first_100_rows_manual_hard_addon",
+  "idk_sentence": "I don't know based on the provided Medium articles data.",
+  "notes": "Curated locally from the first 100 CSV rows and checked against tests/golden/subset100.json to avoid duplicating existing questions. Questions follow the four assignment PDF task shapes and intentionally use body-level clues, plausible distractors, multi-result ambiguity, and near-miss IDK cases.",
+  "tests": [
+    {
+      "question_id": "hard_type1_001",
+      "question_type": 1,
+      "question": "Find an article arguing that trying to squeeze more from the clock can leave creative people more overwhelmed, and that the better lever is managing mental energy. Provide the title and author.",
+      "expected_article_idx": 58,
+      "acceptable_article_indices": [58],
+      "expected_titles": ["Mind Management, Not Time Management now available for pre-order"],
+      "expect_idk": false,
+      "body_anchors": ["the more time you save, the less time you have", "squeezing blood from a stone", "creativity matters"],
+      "rubric": "Must identify David Kadavy's 'Mind Management, Not Time Management now available for pre-order' and provide its title and author. The answer should connect the article to the argument that conventional time-saving tactics can worsen overwhelm, while managing attention or mental energy matters for creative work."
+    },
+    {
+      "question_id": "hard_type1_002",
+      "question_type": 1,
+      "question": "Find an article that connects FOMO among millennials to a design mechanism based on people hating losses more than gains. Provide the title and author.",
+      "expected_article_idx": 18,
+      "acceptable_article_indices": [18],
+      "expected_titles": ["Loss Aversion \u2014 how fear influences customer choice"],
+      "expect_idk": false,
+      "body_anchors": ["70% of millennials", "psychological pain of losing", "design mechanism"],
+      "rubric": "Must name 'Loss Aversion \u2014 how fear influences customer choice' by Jennifer Clinehens and explain that the article links FOMO and loss aversion to customer choice or design."
+    },
+    {
+      "question_id": "hard_type1_003",
+      "question_type": 1,
+      "question": "Find an article that says systems neuroscience should capture the firing and the wiring at the same time. Provide the title and author.",
+      "expected_article_idx": 23,
+      "acceptable_article_indices": [23],
+      "expected_titles": ["What Should Systems Neuroscience Do Next? Voltage Imaging"],
+      "expect_idk": false,
+      "body_anchors": ["the firing and the wiring at the same time", "zona incerta", "multiple individual neurons"],
+      "rubric": "Must identify Mark Humphries' article on voltage imaging and provide the title and author. The answer should not return general neuroscience humor or medical-mystery articles."
+    },
+    {
+      "question_id": "hard_type1_004",
+      "question_type": 1,
+      "question": "Find an article about querying different kinds of data sources without first moving all the data into one database. Provide the title and author.",
+      "expected_article_idx": 81,
+      "acceptable_article_indices": [81],
+      "expected_titles": ["Federated Querying across Relational, Non-relational, Object, and Custom Data Sources using Amazon Athena"],
+      "expect_idk": false,
+      "body_anchors": ["DynamoDB", "single SQL query", "AWS Lambda"],
+      "rubric": "Must identify the Amazon Athena federated querying article by Engineering Zenofai and mention querying multiple source types in place, data source connectors, or serverless connector deployment as the grounding."
+    },
+    {
+      "question_id": "hard_type1_005",
+      "question_type": 1,
+      "question": "Find an article about artists using blockchain-based ownership certificates to prove who controls their online creative work. Provide the title and author.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["blockchain ownership certificates", "online creative work", "artists"],
+      "rubric": "Must return the exact IDK sentence. Nearby art, writing, branding, and creative-business articles are distractors, but the first 100 rows do not contain a blockchain ownership or tokenized provenance article for artists."
+    },
+    {
+      "question_id": "hard_type2_001",
+      "question_type": 2,
+      "question": "List exactly 3 articles about writers using outside channels to bring readers back to their work, such as Q&A sites, email forms, or guest posts. Return only the titles.",
+      "expected_article_idx": 30,
+      "acceptable_article_indices": [30, 38, 99],
+      "expected_titles": [
+        "Quora Overview",
+        "How to Add Upscribe Forms to Your Medium Posts",
+        "How to Write a Dynamite Pitch For Your Guest Post"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["outbound traffic", "email sign-up form", "get your foot in the door"],
+      "rubric": "Should return exactly the three distinct titles in the acceptable set. Answers should focus on external audience-acquisition channels and must not substitute general writing craft, branding, headline, or motivation articles."
+    },
+    {
+      "question_id": "hard_type2_002",
+      "question_type": 2,
+      "question": "List exactly 3 articles about neuroscience research methods or theory, not personal mental-health advice. Return only the titles.",
+      "expected_article_idx": 8,
+      "acceptable_article_indices": [8, 23, 33, 43, 50, 53, 96],
+      "expected_titles": [
+        "Occam\u2019s dice",
+        "What Should Systems Neuroscience Do Next? Voltage Imaging",
+        "Evolution doesn\u2019t give a damn what you think a brain region is called",
+        "Thoughts on a medical mystery",
+        "A not entirely serious future history of neuroscience",
+        "2019: a lightly bamboozled review of the year in neuroscience",
+        "The Neuroscientist, A Field Guide"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["biological systems are equipped with redundant strategies", "multiple individual neurons", "brain region"],
+      "rubric": "Should return exactly three distinct titles from the acceptable set. Must avoid personal mental-health, productivity, or general brain wellness articles unless they are framed as neuroscience research methods or theory."
+    },
+    {
+      "question_id": "hard_type2_003",
+      "question_type": 2,
+      "question": "List exactly 3 articles about big tech market power, antitrust, or platform dominance. Return only the titles.",
+      "expected_article_idx": 28,
+      "acceptable_article_indices": [28, 46, 72, 87],
+      "expected_titles": [
+        "Tech Execs Face Congress: 9 Big Takeaways",
+        "House Reports Claims Anticompetitive Behavior by Apple, Amazon, Google, and Facebook",
+        "A Goodbye to Golden Muzzles: Internal Dissent and the Cautionary Tale of Facebook",
+        "How are Big Tech Companies Dominating the Markets in the Global Arena?"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["third-party sellers", "antitrust enforcement agencies", "gatekeeper of e-commerce"],
+      "rubric": "Should return exactly three distinct titles from the acceptable set. Google sustainability, Google Cloud, and Objectron articles are distractors because they mention big tech companies without focusing on market power or antitrust."
+    },
+    {
+      "question_id": "hard_type2_004",
+      "question_type": 2,
+      "question": "List exactly 3 implementation articles about moving, querying, or streamlining data and business processes across systems. Return only the titles.",
+      "expected_article_idx": 69,
+      "acceptable_article_indices": [69, 81, 86],
+      "expected_titles": [
+        "Datalake File Ingestion: From FTP to AWS S3",
+        "Federated Querying across Relational, Non-relational, Object, and Custom Data Sources using Amazon Athena",
+        "How we helped streamline a mobile solutions company\u2019s processes in a business-friendly way"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["FTP to AWS S3", "Data Source Connectors", "moving those into a cloud"],
+      "rubric": "Should return exactly the three distinct titles in the acceptable set. Must not return dashboards, AI theory, computer vision, high-level cloud-market commentary, or big-tech articles that are not implementation articles about moving, querying, or streamlining systems."
+    },
+    {
+      "question_id": "hard_type2_005",
+      "question_type": 2,
+      "question": "List exactly 3 articles with elementary-school math lesson plans. Return only the titles.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["elementary-school math", "lesson plans"],
+      "rubric": "Must return the exact IDK sentence. Education-adjacent or classroom-adjacent references are not enough; the first 100 rows do not contain elementary math lesson-plan articles."
+    },
+    {
+      "question_id": "hard_type3_001",
+      "question_type": 3,
+      "question": "Find an article that warns against over-trusting simple biological explanations, and summarize its central argument.",
+      "expected_article_idx": 8,
+      "acceptable_article_indices": [8],
+      "expected_titles": ["Occam\u2019s dice"],
+      "expect_idk": false,
+      "body_anchors": ["Seek simplicity and distrust it", "Occam\u2019s razor", "redundant strategies and contingencies"],
+      "rubric": "Must identify 'Occam\u2019s dice' and summarize that simple explanations can mislead in biology because living systems are complex, redundant, contingent, and hard to interpret with overly neat metaphors."
+    },
+    {
+      "question_id": "hard_type3_002",
+      "question_type": 3,
+      "question": "Find an article arguing that trust builds faster when people understand the moment that shaped someone's values, and summarize its central argument.",
+      "expected_article_idx": 9,
+      "acceptable_article_indices": [9],
+      "expected_titles": ["To Quickly Build Trust, Tell Your Origin Story"],
+      "expect_idk": false,
+      "body_anchors": ["Superman", "Steve Jobs", "practices he found unethical"],
+      "rubric": "Must identify Andy Raskin's origin-story article and summarize that a clear origin story reveals character, trustworthiness, commitment, and why someone does what they do. The answer should not merely return a generic branding or storytelling article."
+    },
+    {
+      "question_id": "hard_type3_003",
+      "question_type": 3,
+      "question": "Find an article that treats curiosity as a way to interrupt a bad-habit loop, and summarize the central argument.",
+      "expected_article_idx": 14,
+      "acceptable_article_indices": [14],
+      "expected_titles": ["The Ted Talk That Changed My Life"],
+      "expect_idk": false,
+      "body_anchors": ["prefrontal cortex", "fourth slice of pizza", "curiosity as a tool to disrupt the cycle"],
+      "rubric": "Must identify 'The Ted Talk That Changed My Life' and summarize the habit-loop argument: stress weakens awareness, but mindful curiosity can interrupt trigger-behavior-reward patterns."
+    },
+    {
+      "question_id": "hard_type3_004",
+      "question_type": 3,
+      "question": "Find an article that pushes back on forcing a daily writing streak when it damages health, and summarize its central argument.",
+      "expected_article_idx": 93,
+      "acceptable_article_indices": [93],
+      "expected_titles": ["No, You Don\u2019t Need to Write Everyday"],
+      "expect_idk": false,
+      "body_anchors": ["do what is sustainable", "burning yourself to the ground", "well-rested"],
+      "rubric": "Must identify 'No, You Don\u2019t Need to Write Everyday' and summarize that writers should choose sustainable, intentional rhythms over harmful daily-output pressure."
+    },
+    {
+      "question_id": "hard_type3_005",
+      "question_type": 3,
+      "question": "Find an article that argues changing gut bacteria with probiotics is a proven treatment for anorexia, and summarize its central argument.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["probiotics", "proven treatment", "anorexia"],
+      "rubric": "Must return the exact IDK sentence. Gut-brain, antibiotics, food-craving, and anorexia-origin articles are near misses, but the first 100 rows do not claim that probiotics are a proven treatment for anorexia."
+    },
+    {
+      "question_id": "hard_type4_001",
+      "question_type": 4,
+      "question": "My job pays the bills, but I resent it because I think my art should support me by now. Which article would you recommend, and why?",
+      "expected_article_idx": 15,
+      "acceptable_article_indices": [15],
+      "expected_titles": ["How to Make Your Day Job Support Your Art"],
+      "expect_idk": false,
+      "body_anchors": ["You aren\u2019t a failure if your art doesn\u2019t let you quit your day job", "schedule your art", "serving your art"],
+      "rubric": "Must recommend 'How to Make Your Day Job Support Your Art' by Shaunta Grimes and justify it with the article's argument that a day job can support art financially and psychologically."
+    },
+    {
+      "question_id": "hard_type4_002",
+      "question_type": 4,
+      "question": "I need a guided creative exercise that makes me build a speculative world through a concrete scenario, roles, and constraints, not just general inspiration. Which article would you recommend, and why?",
+      "expected_article_idx": 76,
+      "acceptable_article_indices": [76],
+      "expected_titles": ["Here Is A Creative Exercise in Futuristic Storytelling and Worldbuilding"],
+      "expect_idk": false,
+      "body_anchors": ["the year 2120", "a starship is leaving the Earth", "12 crew members"],
+      "rubric": "Must recommend Fahri Karakas' futuristic storytelling/worldbuilding exercise and justify it with the article's constrained scenario, roles, and guided story-building questions. The answer should not choose generic creativity, productivity, or dialogue-writing advice."
+    },
+    {
+      "question_id": "hard_type4_003",
+      "question_type": 4,
+      "question": "I have old notebooks and half-finished drafts that might still contain useful ideas. Which article would you recommend, and why?",
+      "expected_article_idx": 95,
+      "acceptable_article_indices": [95],
+      "expected_titles": ["Discover the Forgotten Treasures in Your Creative Cellar"],
+      "expect_idk": false,
+      "body_anchors": ["unfinished creative writing projects", "lurking in your cellar", "Carrie, his first published novel"],
+      "rubric": "Must recommend 'Discover the Forgotten Treasures in Your Creative Cellar' and justify it as advice for excavating and reviving old creative material."
+    },
+    {
+      "question_id": "hard_type4_004",
+      "question_type": 4,
+      "question": "I want to improve dialogue by studying how a classic novel scene works in context. Which article would you recommend, and why?",
+      "expected_article_idx": 85,
+      "acceptable_article_indices": [85],
+      "expected_titles": ["F. Scott Fitzgerald on How to Write Masterful Dialogue"],
+      "expect_idk": false,
+      "body_anchors": ["Life starts all over again when it gets crisp in the fall", "page 107", "Increase Conflict Through Contradiction"],
+      "rubric": "Must recommend Nicole Bianchi's Fitzgerald dialogue article and justify it with the article's use of a Great Gatsby scene to derive dialogue-writing advice."
+    },
+    {
+      "question_id": "hard_type4_005",
+      "question_type": 4,
+      "question": "I want practical help turning my own home into a net-zero energy system, including what equipment to buy and how to size it. Which article would you recommend, and why?",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["home net-zero energy system", "equipment buying guide", "system sizing"],
+      "rubric": "Must return the exact IDK sentence. Sustainability, circular-economy, renewable-energy, and green-policy articles are plausible distractors, but none of the first 100 rows gives practical home net-zero equipment selection or sizing guidance."
+    }
+  ]
+}

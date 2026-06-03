@@ -1,0 +1,93 @@
+[
+  {
+    "question": "Find an article that reframes marketing as a conversation with readers, aimed at writers who find self-promotion uncomfortable. Provide the title and author.",
+    "expected_dedup": false,
+    "type": 1,
+    "note": "assignment Q1 (verbatim anchor); type-1 find-one; format ask must be stripped",
+    "recorded_response": "{\"query\":\"marketing as a conversation with readers, writers uncomfortable with self-promotion\",\"dedup\":false}"
+  },
+  {
+    "question": "I'm looking for an article about why remote teams struggle to build trust.",
+    "expected_dedup": false,
+    "type": 1,
+    "note": "type-1, natural search phrasing ('I'm looking for')",
+    "recorded_response": "{\"query\":\"why remote teams struggle to build trust\",\"dedup\":false}"
+  },
+  {
+    "question": "I'd like to read about someone's experience of learning to code at 40.",
+    "expected_dedup": false,
+    "type": 1,
+    "note": "type-1, natural phrasing ('I'd like to read'); keep the '40' anchor",
+    "recorded_response": "{\"query\": \"learning to code at 40 someone's experience\", \"dedup\": false}"
+  },
+  {
+    "question": "I'm searching for an article on Elon Musk's management style at Tesla.",
+    "expected_dedup": false,
+    "type": 1,
+    "note": "type-1, natural phrasing; named entities (Elon Musk, Tesla) must survive",
+    "recorded_response": "{\"query\": \"Elon Musk's management style at Tesla\", \"dedup\": false}"
+  },
+  {
+    "question": "List exactly 3 articles about education. Return only the titles.",
+    "expected_dedup": true,
+    "type": 2,
+    "note": "assignment Q2 (verbatim anchor); type-2 multi-result; the canonical dedup=true case",
+    "recorded_response": "{\"query\": \"education\", \"dedup\": true}"
+  },
+  {
+    "question": "Find me a few articles about climate change.",
+    "expected_dedup": true,
+    "type": 2,
+    "note": "type-2 multi-result, natural phrasing ('a few articles')",
+    "recorded_response": "{\"query\": \"climate change\", \"dedup\": true}"
+  },
+  {
+    "question": "I'm looking for some articles about productivity.",
+    "expected_dedup": true,
+    "type": 2,
+    "note": "type-2 multi-result, natural phrasing ('some articles')",
+    "recorded_response": "{\"query\": \"productivity\", \"dedup\": true}"
+  },
+  {
+    "question": "Can you recommend 3 articles on machine learning for beginners?",
+    "expected_dedup": true,
+    "type": 2,
+    "note": "type-2 multi-result ('3 articles'); contrast with single-recommend type-4 below",
+    "recorded_response": "{\"query\":\"machine learning for beginners\",\"dedup\":true}"
+  },
+  {
+    "question": "Find an article that argues past pandemics (such as the bubonic plague) can spur innovation and recovery, and summarise its central argument.",
+    "expected_dedup": false,
+    "type": 3,
+    "note": "assignment Q3 (verbatim anchor); type-3 single-article summary",
+    "recorded_response": "{\"query\":\"past pandemics (such as the bubonic plague) can spur innovation and recovery\",\"dedup\":false}"
+  },
+  {
+    "question": "I'd like to read an article about the ethics of AI surveillance.",
+    "expected_dedup": false,
+    "type": 3,
+    "note": "type-3, natural phrasing; single article",
+    "recorded_response": "{\"query\":\"ethics of AI surveillance\",\"dedup\":false}"
+  },
+  {
+    "question": "I'd like a summary of an article on the psychology of procrastination.",
+    "expected_dedup": false,
+    "type": 3,
+    "note": "type-3, explicit summary ask; single article",
+    "recorded_response": "{\"query\":\"psychology of procrastination\",\"dedup\":false}"
+  },
+  {
+    "question": "I want practical, beginner-friendly advice on building habits that actually stick. Which article would you recommend, and why?",
+    "expected_dedup": false,
+    "type": 4,
+    "note": "assignment Q4 (verbatim anchor); type-4 recommend-one with justification",
+    "recorded_response": "{\"query\": \"practical, beginner-friendly advice on building habits that actually stick\", \"dedup\": false}"
+  },
+  {
+    "question": "I have creative block - which article would you recommend to help, and why?",
+    "expected_dedup": false,
+    "type": 4,
+    "note": "type-4 recommend-one (single 'recommend', contrast with the type-2 'recommend 3 articles')",
+    "recorded_response": "{\"query\": \"creative block which article would you recommend to help and why\", \"dedup\": false}"
+  }
+]

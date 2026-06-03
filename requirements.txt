@@ -1,0 +1,11 @@
+pyyaml==6.0.2
+python-dotenv==1.0.1
+pytest==8.3.4
+pandas==2.2.3
+langchain-openai==1.2.2
+langchain-text-splitters==1.1.2
+tiktoken==0.13.0
+pinecone==5.4.2
+fastapi==0.115.6
+uvicorn==0.34.0
+httpx==0.28.1

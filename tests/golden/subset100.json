@@ -1,0 +1,253 @@
+{
+  "dataset": "medium-english-50mb.csv",
+  "limit": 100,
+  "selection_method": "first_100_rows_manual_curated",
+  "idk_sentence": "I don't know based on the provided Medium articles data.",
+  "notes": "Manually curated from load_articles(limit=100). Questions are intentionally semantic: most non-IDK tests use body anchors that are not copied from titles or tags.",
+  "tests": [
+    {
+      "question_id": "type1_001",
+      "question_type": 1,
+      "question": "Find an article about Phineas Gage. Provide the title and author.",
+      "expected_article_idx": 3,
+      "acceptable_article_indices": [3],
+      "expected_titles": ["Surviving a Rod Through the Head"],
+      "expect_idk": false,
+      "body_anchors": ["Phineas Gage", "railroad worker", "frontal lobe"],
+      "rubric": "Must name 'Surviving a Rod Through the Head' by Rishav Sinha and identify it as the article about Phineas Gage."
+    },
+    {
+      "question_id": "type1_002",
+      "question_type": 1,
+      "question": "Find an article about banned antibacterial compounds that still show up in ordinary homes and bodies. Provide the title and author.",
+      "expected_article_idx": 19,
+      "acceptable_article_indices": [19],
+      "expected_titles": ["The FDA Banned These Chemicals \u2014 and They\u2019re Still Everywhere"],
+      "expect_idk": false,
+      "body_anchors": ["triclosan", "triclocarban", "household plastics"],
+      "rubric": "Must name 'The FDA Banned These Chemicals \u2014 and They\u2019re Still Everywhere' by Maryn Mckenna and mention banned antibacterial chemicals such as triclosan or triclocarban."
+    },
+    {
+      "question_id": "type1_003",
+      "question_type": 1,
+      "question": "Find an article about a psychosis-risk signal involving how people use words related to sound. Provide the title and author.",
+      "expected_article_idx": 40,
+      "acceptable_article_indices": [40],
+      "expected_titles": ["AI analyzes language to predict schizophrenia"],
+      "expect_idk": false,
+      "body_anchors": ["words associated with sound", "semantic density", "93 percent accuracy"],
+      "rubric": "Must name 'AI analyzes language to predict schizophrenia' by Phil Siarri and connect it to language patterns that predict psychosis risk."
+    },
+    {
+      "question_id": "type1_004",
+      "question_type": 1,
+      "question": "Find an article about a smartphone system that can estimate an object's size and orientation in real time. Provide the title and author.",
+      "expected_article_idx": 92,
+      "acceptable_article_indices": [92],
+      "expected_titles": ["Google Objectron \u2014 A giant leap for the 3D object detection"],
+      "expect_idk": false,
+      "body_anchors": ["MediaPipe Objectron", "size and orientation", "real-time"],
+      "rubric": "Must name 'Google Objectron \u2014 A giant leap for the 3D object detection' by Jair Ribeiro and mention real-time 3D object detection."
+    },
+    {
+      "question_id": "type1_005",
+      "question_type": 1,
+      "question": "Find an article about intermittent fasting improving memory. Provide the title and author.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["intermittent fasting", "memory"],
+      "rubric": "Must return the exact IDK sentence because the first 100 articles do not contain an article about intermittent fasting improving memory."
+    },
+    {
+      "question_id": "type2_001",
+      "question_type": 2,
+      "question": "List exactly 3 articles about the pandemic's psychological or social effects. Return only the titles.",
+      "expected_article_idx": 1,
+      "acceptable_article_indices": [1, 4, 34, 70, 91],
+      "expected_titles": [
+        "Your Brain On Coronavirus",
+        "Mentally, Young Adults Are Suffering Most From COVID",
+        "Is It Fear You Feel, Or Anxiety?",
+        "Only 49% of Americans Plan to Get Vaccinated Against COVID-19. Yes, You Should Be That Shocked",
+        "People Are Still Vacationing in the Middle of a Pandemic"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["isolation", "acute stress", "49% of Americans", "vacationing"],
+      "rubric": "Should list three relevant pandemic psychology or behavior titles from the acceptable set and must not invent titles."
+    },
+    {
+      "question_id": "type2_002",
+      "question_type": 2,
+      "question": "List exactly 3 articles about making headlines work better without relying on cheap tricks. Return only the titles.",
+      "expected_article_idx": 17,
+      "acceptable_article_indices": [17, 35, 55, 61, 98],
+      "expected_titles": [
+        "An Effective Five-Step Process for Writing Captivating Headlines",
+        "Avoid Clickbait: Headline Techniques Used by Six Reputable Media Sites",
+        "How a 77-Year-Old Theory Can Help You Write Wonderful Headlines",
+        "Do Headlines Really Make a Difference?",
+        "Are Headline Analyzer Tools Really Helpful for Writers \u2014 A Case Study"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["one-sentence synopsis", "clickbait", "Maslow", "first impressions", "headline analyzer"],
+      "rubric": "Should list three headline-writing titles from the acceptable set and must not invent titles."
+    },
+    {
+      "question_id": "type2_003",
+      "question_type": 2,
+      "question": "List exactly 3 articles about practical or scientific applications of AI. Return only the titles.",
+      "expected_article_idx": 32,
+      "acceptable_article_indices": [32, 59, 73, 92, 94],
+      "expected_titles": [
+        "AI creating Human-Looking Images and Tracking Artificial Intelligence Programs in 2020",
+        "Predicting The Protein Structures Using AI",
+        "Essential OpenCV Functions to Get You Started into Computer Vision",
+        "Google Objectron \u2014 A giant leap for the 3D object detection",
+        "AI Unfolds the Science Behind a 50-Year-Old Protein-Folding Problem"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["Artbreeder", "amino acids", "RGB", "MediaPipe Objectron", "AlphaFold"],
+      "rubric": "Should list three AI application titles from the acceptable set and must not invent titles."
+    },
+    {
+      "question_id": "type2_004",
+      "question_type": 2,
+      "question": "List exactly 3 articles about environmental sustainability or climate action. Return only the titles.",
+      "expected_article_idx": 47,
+      "acceptable_article_indices": [47, 62, 67, 78, 83],
+      "expected_titles": [
+        "The Sustainable Element-Technology Nexus that has Great Potential",
+        "Unleash the Potential of AI in Circular Economy: Businesses Potentials",
+        "Ecosystem restoration, reviving hope.",
+        "It\u2019s Now or Never for a Green New Deal",
+        "How Google and Its Geeks Nudge Each Other to Sustainability"
+      ],
+      "expect_idk": false,
+      "body_anchors": ["water pollution", "smart sensors", "land degradation", "net zero", "renewable energy"],
+      "rubric": "Should list three sustainability or climate-action titles from the acceptable set and must not invent titles."
+    },
+    {
+      "question_id": "type2_005",
+      "question_type": 2,
+      "question": "List exactly 3 articles about cooking recipes for weeknight dinners. Return only the titles.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["cooking recipes", "weeknight dinners"],
+      "rubric": "Must return the exact IDK sentence because food or gut-health distractors are not recipe articles."
+    },
+    {
+      "question_id": "type3_001",
+      "question_type": 3,
+      "question": "Find an article about training an overlooked sense to change the brain, and summarize its central argument.",
+      "expected_article_idx": 2,
+      "acceptable_article_indices": [2],
+      "expected_titles": ["Mind Your Nose"],
+      "expect_idk": false,
+      "body_anchors": ["olfactory system", "adult neurogenesis", "olfactory neurons"],
+      "rubric": "Must identify 'Mind Your Nose' and summarize smell training, olfactory plasticity, and brain adaptation."
+    },
+    {
+      "question_id": "type3_002",
+      "question_type": 3,
+      "question": "Find an article that discusses Proust, Chekhov, and Kafka while questioning what kind of sound environment helps creativity, and summarize its central argument.",
+      "expected_article_idx": 12,
+      "acceptable_article_indices": [12],
+      "expected_titles": ["For Creatives, Silence Isn\u2019t Always Golden"],
+      "expect_idk": false,
+      "body_anchors": ["Proust", "Chekhov", "Kafka"],
+      "rubric": "Must identify 'For Creatives, Silence Isn\u2019t Always Golden' and explain why silence is not always the best creative environment."
+    },
+    {
+      "question_id": "type3_003",
+      "question_type": 3,
+      "question": "Find an article about how AI could help businesses become more circular, and summarize the main argument.",
+      "expected_article_idx": 62,
+      "acceptable_article_indices": [62],
+      "expected_titles": ["Unleash the Potential of AI in Circular Economy: Businesses Potentials"],
+      "expect_idk": false,
+      "body_anchors": ["smart sensors", "modularity", "durability"],
+      "rubric": "Must identify the circular-economy AI article and summarize business opportunities such as environmental monitoring, data analysis, or product innovation."
+    },
+    {
+      "question_id": "type3_004",
+      "question_type": 3,
+      "question": "Find an article that pushes back on calling low motivation laziness, and summarize its central argument.",
+      "expected_article_idx": 88,
+      "acceptable_article_indices": [88],
+      "expected_titles": ["\u2018Am I Just Lazy?\u2019"],
+      "expect_idk": false,
+      "body_anchors": ["buck up", "depressed", "productivity"],
+      "rubric": "Must identify '\u2018Am I Just Lazy?\u2019' and explain the distinction between laziness, productivity guilt, and depression or mental health."
+    },
+    {
+      "question_id": "type3_005",
+      "question_type": 3,
+      "question": "Find an article that argues social media algorithms are the main cause of teenage sleep loss, and summarize its central argument.",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["social media algorithms", "teenage sleep loss"],
+      "rubric": "Must return the exact IDK sentence because adjacent mental-health or productivity articles do not make this argument."
+    },
+    {
+      "question_id": "type4_001",
+      "question_type": 4,
+      "question": "I already have a series of posts and want to turn it into something bigger. Which article would you recommend, and why?",
+      "expected_article_idx": 5,
+      "acceptable_article_indices": [5],
+      "expected_titles": ["How to Turn Your Popular Blog Series Into a Bestselling Book"],
+      "expect_idk": false,
+      "body_anchors": ["limited budget", "blog", "book"],
+      "rubric": "Must recommend 'How to Turn Your Popular Blog Series Into a Bestselling Book' and justify it with advice about turning posts into a book."
+    },
+    {
+      "question_id": "type4_002",
+      "question_type": 4,
+      "question": "I'm a writer who hates putting myself out there but still needs readers. Which article would you recommend, and why?",
+      "expected_article_idx": 37,
+      "acceptable_article_indices": [37],
+      "expected_titles": ["A Marketing Guide for Introverts"],
+      "expect_idk": false,
+      "body_anchors": ["writing cave", "Marketing. Ugh.", "introverts"],
+      "rubric": "Must recommend 'A Marketing Guide for Introverts' and justify it as marketing guidance for an introverted writer."
+    },
+    {
+      "question_id": "type4_003",
+      "question_type": 4,
+      "question": "I'm building an app but suspect my starting assumptions may be wrong. Which article would you recommend, and why?",
+      "expected_article_idx": 56,
+      "acceptable_article_indices": [56],
+      "expected_titles": ["Exploring Your Mobile App Business Idea"],
+      "expect_idk": false,
+      "body_anchors": ["false until proven valid", "Minimum Viable Products", "assumptions"],
+      "rubric": "Must recommend 'Exploring Your Mobile App Business Idea' and justify it with validating assumptions before building."
+    },
+    {
+      "question_id": "type4_004",
+      "question_type": 4,
+      "question": "I'm a founder going through a rough patch and need advice on handling setbacks. Which article would you recommend, and why?",
+      "expected_article_idx": 79,
+      "acceptable_article_indices": [79],
+      "expected_titles": ["Founders\u2019 silent struggle \u2014 Overcoming setbacks (Part 6)"],
+      "expect_idk": false,
+      "body_anchors": ["Asking for help", "emotional support", "startup journey"],
+      "rubric": "Must recommend 'Founders\u2019 silent struggle \u2014 Overcoming setbacks (Part 6)' and justify it with asking for help or finding emotional support."
+    },
+    {
+      "question_id": "type4_005",
+      "question_type": 4,
+      "question": "I want practical advice on training for a marathon without getting injured. Which article would you recommend, and why?",
+      "expected_article_idx": null,
+      "acceptable_article_indices": [],
+      "expected_titles": [],
+      "expect_idk": true,
+      "body_anchors": ["marathon", "injured"],
+      "rubric": "Must return the exact IDK sentence because general health or productivity articles are distractors, not marathon-training advice."
+    }
+  ]
+}
