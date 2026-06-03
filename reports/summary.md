@@ -28,7 +28,7 @@ These values satisfy the assignment caps: chunk size is at most 1024 tokens, ove
 
 ## Experiment Summary
 
-The workflow followed the assignment recommendation to validate on small subsets before scaling:
+The workflow validated retrieval on small subsets before scaling:
 
 1. Smoke-tested the pipeline on a tiny subset.
 2. Compared embedding content variants on a deterministic 100-row subset.
@@ -37,11 +37,16 @@ The workflow followed the assignment recommendation to validate on small subsets
 5. Selected `chunk_only`, `chunk_size=768`, `overlap_ratio=0.10`, `top_k=5`.
 6. Ingested the full 7,682-article corpus into Pinecone namespace `prod`.
 
-The selected config scored perfectly on the original curated 20-question subset and tied for the best reviewed score on the hard add-on set. Detailed artifacts are in:
+The selected config scored perfectly on the original curated 20-question subset and tied for the best reviewed score on the hard add-on set. Detailed experiment notes are in:
 
+- `reports/eval/phase_a_b_experiments_20260603.md`
 - `reports/eval/final_config_decision_20260602.md`
 - `reports/eval/hard_addon_10_config_aggregate_20260602.md`
 - `reports/eval/prod_scale_sanity_20260602.md`
+
+Phase A compared embedded text formats. With fixed `chunk_size=512`, `overlap_ratio=0.10`, and `top_k=5`, `chunk_only` reached `1.0000` recall and `0.9833` combined score, while `title_tags_chunk` reached `0.9375` recall and `0.9458` combined score.
+
+Phase B then swept chunk size, overlap, and top-k for `chunk_only`. The original 20-question set was useful as a filter but too easy as a final selector: 10 of 27 Phase B configurations scored perfectly. A harder add-on set was therefore run against only those 10 tied configs. The final selected config, `chunk_size=768`, `overlap_ratio=0.10`, `top_k=5`, tied for the best hard-add-on combined score while using less retrieved context than the `top_k=8` alternative and less overlap than the `0.15` alternative.
 
 ## Known Retrieval Limitation
 

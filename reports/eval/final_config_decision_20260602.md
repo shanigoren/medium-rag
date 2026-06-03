@@ -18,6 +18,8 @@ This is the `c768_o10_k5` configuration.
 
 ## Evidence
 
+Detailed Phase A and Phase B experiment documentation is in `reports/eval/phase_a_b_experiments_20260603.md`.
+
 Original curated set:
 
 - Test file: `tests/golden/subset100.json`
@@ -36,6 +38,10 @@ Hard add-on set:
 - Failed question: `hard_type2_004`
 
 The hard add-on was introduced because the original 20-question set was too coarse for final selection: 10 of 27 Phase B configs scored perfectly. The add-on was run only on those 10 tied configs, using existing namespaces only.
+
+Phase A selected `chunk_only` over `title_tags_chunk`. Under the same `chunk_size=512`, `overlap_ratio=0.10`, and `top_k=5` settings, `chunk_only` had perfect retrieval recall and a higher combined score. The metadata-prefixed version was weaker on the subset, likely because broad title/tag terms sometimes competed with the passage semantics.
+
+Phase B then compared 27 `chunk_only` configs across chunk sizes 512, 768, and 1024; overlap ratios 0.05, 0.10, and 0.15; and top-k values 3, 5, and 8. The 1024-token runs were consistently weaker on recall. Several 512-token and 768-token runs were perfect on the original set, so final selection depended on the hard add-on.
 
 ## Why This Config
 
