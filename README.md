@@ -20,14 +20,7 @@ The public API exposes:
 
 ## Reports
 
-The main report is [reports/summary.md](reports/summary.md).
-
-Experiment and evaluation notes are in [reports/eval](reports/eval):
-
-- [phase_a_b_experiments_20260603.md](reports/eval/phase_a_b_experiments_20260603.md)
-- [final_config_decision_20260602.md](reports/eval/final_config_decision_20260602.md)
-- [hard_addon_10_config_aggregate_20260602.md](reports/eval/hard_addon_10_config_aggregate_20260602.md)
-- [prod_scale_sanity_20260602.md](reports/eval/prod_scale_sanity_20260602.md)
+The experiment report and final configuration rationale are in [reports/eval/experiments.md](reports/eval/experiments.md).
 
 ## Setup
 
