@@ -17,10 +17,26 @@ reports/tmp_course_text/
 # Local detailed experiment artifacts
 reports/costs/
 reports/proposals/
+reports/eval/eval1_*/
 reports/eval/eval20_*/
+reports/eval/eval4_*/
+reports/eval/vercel_*/
+reports/eval/topk8_failed_retry_tests.json
+reports/eval/topk8_high_reasoning_probe_tests.json
+reports/eval/topk8_medium_reasoning_probe_tests.json
 
 # Saved stdout from money-costing runs
 run_logs/
+
+# Local validation helpers
+scripts/check_llmod_budget.py
+scripts/evaluate_failed_topk8_retry.py
+scripts/evaluate_reasoning_high_probe.py
+scripts/evaluate_reasoning_medium_probe.py
+scripts/run_reasoning_medium_probe.py
+scripts/evaluate_vercel_api.py
+scripts/manual_prod_review_search.py
+scripts/probe_rewrite_variants.py
 
 # Data: large binary, lives locally and in Pinecone only
 medium-english-50mb.csv
