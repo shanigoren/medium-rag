@@ -24,6 +24,7 @@ reports/eval/vercel_*/
 reports/eval/topk8_failed_retry_tests.json
 reports/eval/topk8_high_reasoning_probe_tests.json
 reports/eval/topk8_medium_reasoning_probe_tests.json
+reports/eval/phase_d_targeted1000/
 
 # Saved stdout from money-costing runs
 run_logs/
@@ -37,6 +38,9 @@ scripts/run_reasoning_medium_probe.py
 scripts/evaluate_vercel_api.py
 scripts/manual_prod_review_search.py
 scripts/probe_rewrite_variants.py
+scripts/build_phase_d_targeted_subset.py
+scripts/ingest_phase_d_subset.py
+scripts/eval_phase_d_retrieval.py
 
 # Data: large binary, lives locally and in Pinecone only
 medium-english-50mb.csv

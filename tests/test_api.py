@@ -186,11 +186,11 @@ def test_stats_returns_exactly_three_keys(client, cfg):
 
 def test_stats_values_and_types_match_config(client, cfg):
     """Against the repo config.yaml: chunk_size==768 (int), overlap_ratio==0.10
-    (float), top_k==5 (int)."""
+    (float), top_k==20 (int)."""
     body = client.get("/api/stats").json()
     assert body["chunk_size"] == 768 and isinstance(body["chunk_size"], int)
     assert body["overlap_ratio"] == 0.10 and isinstance(body["overlap_ratio"], float)
-    assert body["top_k"] == 5 and isinstance(body["top_k"], int)
+    assert body["top_k"] == 20 and isinstance(body["top_k"], int)
 
 
 def test_stats_reflects_live_config_override(client, cfg, monkeypatch):

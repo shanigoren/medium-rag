@@ -155,8 +155,8 @@ def test_top_k_defaults_to_cfg_top_k(fake_pc, fake_query_embeddings, cfg):
 
 
 def test_explicit_top_k_overrides_cfg(fake_pc, fake_query_embeddings, cfg):
-    """retrieve(..., top_k=2) returns 2 distinct articles even though cfg.top_k==5."""
-    assert cfg.top_k == 5
+    """retrieve(..., top_k=2) returns 2 distinct articles even though cfg.top_k==20."""
+    assert cfg.top_k == 20
     _set_matches(fake_pc, cfg, [
         _m("7", 0.9, 0), _m("8", 0.8, 0), _m("9", 0.7, 0), _m("10", 0.6, 0),
     ])

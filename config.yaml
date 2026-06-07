@@ -1,7 +1,7 @@
-# RAG hyperparameters (final selected config from Phase B + hard add-on eval)
-chunk_size: 768                # tokens; selected config c768_o10_k5
-overlap_ratio: 0.10            # 10%; tied best without extra overlap cost
-top_k: 5                       # tied best on hard add-on; less context than k=8
+# RAG hyperparameters (final selected config after full-corpus Phase D eval)
+chunk_size: 768                # tokens; stable full-corpus production ingest
+overlap_ratio: 0.10            # 10%; balanced overlap without extra ingest cost
+top_k: 20                      # Phase D winner: better recall than k=5, less context than k=30
 retrieval_fetch_k: 30          # over-fetch then dedupe (assignment cap is 30)
 embed_content: "chunk_only"    # Phase A winner; final selected config
 

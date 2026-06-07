@@ -117,8 +117,8 @@ def test_cp_c_list3_returns_distinct_articles(fake_pc, fake_query_embeddings, fa
 
 def test_cp_c_stats_reflects_committed_config(cfg):
     """GET /api/stats -> EXACTLY {'chunk_size','overlap_ratio','top_k'} equal to the
-    committed config.yaml (768 / 0.10 / 5). No LLM/Pinecone touched. CP-F re-runs
+    committed config.yaml (768 / 0.10 / 20). No LLM/Pinecone touched. CP-F re-runs
     this identical assertion against the live Vercel URL."""
     client = TestClient(api_index.app)
     body = client.get("/api/stats").json()
-    assert body == {"chunk_size": 768, "overlap_ratio": 0.10, "top_k": 5}
+    assert body == {"chunk_size": 768, "overlap_ratio": 0.10, "top_k": 20}

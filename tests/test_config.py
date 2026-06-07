@@ -77,7 +77,7 @@ def test_load_defaults_from_repo_yaml(monkeypatch):
     assert isinstance(cfg, Config)
     assert cfg.chunk_size == 768
     assert cfg.overlap_ratio == 0.10
-    assert cfg.top_k == 5
+    assert cfg.top_k == 20
     assert cfg.retrieval_fetch_k == 30
     assert cfg.embed_content == "chunk_only"
     assert cfg.embed_dim == 1536

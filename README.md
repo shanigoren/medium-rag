@@ -7,7 +7,7 @@ The current production configuration is:
 ```yaml
 chunk_size: 768
 overlap_ratio: 0.10
-top_k: 5
+top_k: 20
 retrieval_fetch_k: 30
 embed_content: "chunk_only"
 pinecone_namespace: "prod"

@@ -1,0 +1,5 @@
+Public live URL:
+https://medium-rag-git-main-shanigorens-projects.vercel.app/
+
+Public GitHub URL:
+https://github.com/shanigoren/medium-rag

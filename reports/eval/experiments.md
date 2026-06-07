@@ -18,7 +18,7 @@ The assistant answers only from retrieved Medium article metadata and passages. 
 |---|---:|
 | `chunk_size` | `768` |
 | `overlap_ratio` | `0.10` |
-| `top_k` | `5` |
+| `top_k` | `20` |
 | `retrieval_fetch_k` | `30` |
 | `embed_content` | `chunk_only` |
 | `reasoning_effort` | `low` |
@@ -28,7 +28,7 @@ These values satisfy the assignment caps: chunk size is at most 1024 tokens, ove
 
 ## Experiment Overview
 
-This report documents the subset experiments used to choose the production RAG configuration before the full-corpus ingest, plus later full-corpus checks against the production namespace.
+This report documents the subset experiments used to choose the initial production RAG configuration, plus later full-corpus checks that led to the final runtime retrieval setting.
 
 ## Evaluation Setup
 
@@ -199,7 +199,7 @@ The `top_k=8` run used the full production namespace (`prod`, 18,456 vectors). F
 
 Increasing `top_k` from 5 to 8 improved one partial case: the daily-writing-streak question received a more relevant full-corpus article. However, it did not fix the clearest retrieval miss, the origin-story trust question, because the intended article still was not retrieved. It also harmed one previously correct unsupported-question case: the home net-zero equipment question should have remained IDK, but the larger context window gave the assistant enough adjacent renewable-energy material to recommend an article while admitting it lacked the requested equipment-buying and sizing guidance.
 
-The result supports keeping `top_k=5` for the final configuration. More retrieved context can help some borderline questions, but it also increases distractor pressure and does not solve deeper semantic retrieval failures.
+At this stage, the result supported keeping `top_k=5` for the initial deployed configuration. More retrieved context helped some borderline questions, but it also increased distractor pressure and did not solve deeper semantic retrieval failures. A later full-corpus Phase D pass revisited this choice with broader evidence.
 
 ### Reasoning-Effort Probe
 
@@ -223,6 +223,86 @@ A final one-question probe tested `top_k=8` with `reasoning_effort=high` on `har
 
 These probes did not justify increasing `reasoning_effort`. They did not fix retrieval misses, and they did not reliably improve strict unsupported-question behavior. The final configuration therefore keeps `reasoning_effort=low`.
 
+## Phase D: Full-Corpus Retrieval Optimization
+
+Phase D was added after deployment because the earlier evaluations were based on a 100-row subset, while the production namespace contains the full 7,682-article corpus. The goal was to check whether the selected production chunking generalized well and whether a different full-corpus configuration would improve difficult retrieval cases without relying on any question-specific rescue logic.
+
+This phase used a targeted 1000-row stress subset first, then promoted only promising candidates to full-corpus checks. The stress subset included:
+
+- the first 100 corpus rows,
+- all expected and acceptable article IDs from the curated question sets,
+- the known pandemic-example target article,
+- prior hard-case retrieval contenders,
+- deterministic random fill to 1000 rows.
+
+The 1000-row sweep tested these ingestion configurations:
+
+| Config | Chunk Size | Overlap | Embed Content |
+|---|---:|---:|---|
+| `c512_o10_chunk` | 512 | 0.10 | `chunk_only` |
+| `c512_o20_chunk` | 512 | 0.20 | `chunk_only` |
+| `c512_o30_chunk` | 512 | 0.30 | `chunk_only` |
+| `c768_o10_chunk` | 768 | 0.10 | `chunk_only` |
+| `c768_o20_chunk` | 768 | 0.20 | `chunk_only` |
+| `c768_o30_chunk` | 768 | 0.30 | `chunk_only` |
+| `c1024_o10_chunk` | 1024 | 0.10 | `chunk_only` |
+| `c768_o10_title_tags` | 768 | 0.10 | `title_tags_chunk` |
+
+For each configuration, retrieval was simulated at `top_k` values 5, 8, 12, 20, and 30. The best stress-subset result for the pandemic example was `c512_o20_chunk`, which moved the target article to rank 6 on that controlled subset. Because this might have been subset-specific, the configuration was ingested and tested on the full corpus before any production change was considered.
+
+### Full-Corpus Candidate Sweep
+
+The full-corpus sweep compared current production with the following full-corpus namespaces:
+
+| Config | Namespace | Vectors |
+|---|---|---:|
+| `prod_c768_o10` | `prod` | 18,456 |
+| `full_c1024_o10` | `phase_d_full_c1024_o10_chunk` | 14,620 |
+| `full_c512_o10` | `phase_d_full_c512_o10_chunk` | 26,491 |
+| `full_c512_o20` | `phase_d_full_c512_o20_chunk` | 28,111 |
+| `full_c512_o30` | `phase_d_full_c512_o30_chunk` | 30,427 |
+| `full_c768_o20` | `phase_d_full_c768_o20_chunk` | 19,307 |
+| `full_c768_o30` | `phase_d_full_c768_o30_chunk` | 20,559 |
+| `full_c768_o10_title_tags` | `prod_title_tags_c768_o10` | 18,456 |
+
+Retrieval-only comparison on the 40 curated questions plus the pandemic example found the strongest `top_k=30` candidates:
+
+| Config | Non-IDK Retrieval | Single Hit | Multi Full Coverage | Notes |
+|---|---:|---:|---:|---|
+| `full_c1024_o10` | 25/33 | 88.0% | 37.5% | Safest automatic improvement over prod; +1 hit, no labeled regression |
+| `full_c512_o10` | 25/33 | 88.0% | 37.5% | +2 hits, but 1 regression |
+| `full_c768_o10_title_tags` | 25/33 | 88.0% | 37.5% | +2 hits, but 1 regression |
+| `prod_c768_o10` | 24/33 | 84.0% | 37.5% | Baseline |
+
+The `c512_o20` configuration that looked promising for the pandemic example did not outperform production on the full corpus. It improved the target article rank from 175 to 80, but still did not bring it into a usable retrieval window, and its overall full-corpus retrieval score tied production rather than beating it.
+
+Pandemic-example target rank within the top 300:
+
+| Config | Target Rank |
+|---|---:|
+| `full_c512_o20` | 80 |
+| `full_c512_o10` | 82 |
+| `full_c512_o30` | 88 |
+| `full_c1024_o10` | 116 |
+| `prod_c768_o10` | 175 |
+| `full_c768_o10_title_tags` | 195 |
+
+No fair chunking or metadata configuration solved the pandemic example within the assignment's `top_k <= 30` limit.
+
+### End-to-End Phase D Check
+
+The safest retrieval-only challenger, `full_c1024_o10`, was tested end to end at `top_k=20` instead of `top_k=30` to avoid unnecessary answer-context expansion. It was compared with the existing end-to-end production runs at `top_k=20` and `top_k=30`.
+
+| Setting | Question Count | Automatic Non-IDK Retrieval | Subset-IDK Pass | Notes |
+|---|---:|---:|---:|---|
+| `prod_c768_o10`, `top_k=20` | 40 | 26/32 | 3/8 | Current production ingest, moderate context |
+| `prod_c768_o10`, `top_k=30` | 40 | 27/32 | 3/8 | One extra retrieval hit, much larger answer context |
+| `full_c1024_o10`, `top_k=20` | 40 | 27/32 | 2/8 | Tied prod `top_k=30`, but regressed one hard query |
+
+The `full_c1024_o10` end-to-end run was competitive, but not a clean win. It recovered two labeled hard cases compared with `prod_c768_o10` at `top_k=20`, but regressed the hard question about querying different data sources without first moving all data into one database. Compared with `prod_c768_o10` at `top_k=30`, it still had that regression and only one retrieval improvement.
+
+Phase D therefore did not justify replacing the production embedding/chunking namespace. It did justify increasing the runtime `top_k` from 5 to 20: this improved full-corpus retrieval while avoiding the larger context and higher cost of `top_k=30`.
+
 ## Final Selection
 
 Final selected configuration:
@@ -232,10 +312,10 @@ Final selected configuration:
 | `embed_content` | `chunk_only` |
 | `chunk_size` | `768` |
 | `overlap_ratio` | `0.10` |
-| `top_k` | `5` |
+| `top_k` | `20` |
 | `retrieval_fetch_k` | `30` |
 
-This setting was then used for the full production ingest into Pinecone namespace `prod`.
+The final setting keeps the existing full production ingest in Pinecone namespace `prod` and changes only the runtime retrieval window. This avoids re-ingesting production while using the broader context window that Phase D showed to be the best trade-off.
 
 ## Known Retrieval Limitation
 
@@ -243,7 +323,7 @@ The full-corpus production sanity check exposed a retrieval weakness on the assi
 
 `Find an article that argues past pandemics (such as the bubonic plague) can spur innovation and recovery, and summarise its central argument.`
 
-The relevant article exists in the full corpus as row `6299`, titled `Rebounding From The Pandemic... with AI`, but the production vector retriever does not surface it within the allowed retrieval window. A later probe found the target article at rank 219 for the original question, which is outside the assignment's maximum `top_k` of 30. Increasing `top_k` up to 30 and trying a full-corpus `title_tags_chunk` namespace did not fix this case.
+The relevant article exists in the full corpus as row `6299`, titled `Rebounding From The Pandemic... with AI`, but the production vector retriever does not surface it within the allowed retrieval window. Phase D found the target article at rank 175 for the current production namespace and at best rank 80 among tested full-corpus alternatives, still outside the assignment's maximum `top_k` of 30.
 
 I am leaving this as an acknowledged shortcoming rather than adding a lexical rescue, hybrid search layer, reranker over a larger candidate pool, or per-question special case. Those approaches may be reasonable future improvements, but they would change the retrieval design beyond the current assignment constraints and would make the reported `top_k` contract less straightforward.
 
