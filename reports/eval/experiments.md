@@ -337,9 +337,24 @@ Latest local verification:
 conda run -n medium-rag pytest -q
 ```
 
-Result: `312 passed, 50 skipped`.
+Result on final validation pass: all active tests passed (`312 passed`).
 
-The deployed Vercel API was also checked end to end on the hard add-on question set. `GET /api/stats` returned the selected production config, and all 20 `POST /api/prompt` calls returned HTTP 200.
+The deployed Vercel API was also checked directly. `GET /api/stats` returned:
+
+```json
+{"chunk_size": 768, "overlap_ratio": 0.1, "top_k": 20}
+```
+
+A live `POST /api/prompt` call returned HTTP 200 with the required top-level keys: `response`, `context`, and `Augmented_prompt`.
+
+The 40 curated questions were rerun against the production Pinecone namespace (`prod`, 18,456 vectors) during the final validation pass:
+
+| Set | Questions | Errors | Recall@k | IDK Pass | Dedup Accuracy |
+|---|---:|---:|---:|---:|---:|
+| Original subset questions | 20 | 0 | 0.9375 | 0.25 | 1.0000 |
+| Hard add-on questions | 20 | 0 | 0.7500 | 0.75 | 1.0000 |
+
+The low IDK score on the original subset is expected on the full production corpus: several questions labeled unsupported for the first 100-row subset have relevant or near-relevant articles elsewhere in the full corpus. The main remaining weaknesses are the same ones identified in Phase D: vector retrieval can miss a few highly semantic targets, and adjacent full-corpus articles can sometimes turn a subset-IDK case into a grounded but different recommendation.
 
 ## Deployment Notes
 
